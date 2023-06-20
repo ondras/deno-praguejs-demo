@@ -9,6 +9,7 @@ main {
 	text-align: center;
 	font-size: calc(80dvmin / var(--size));
 	line-height: 1.2;
+	max-width: 100dvmin;
 }
 
 b {
