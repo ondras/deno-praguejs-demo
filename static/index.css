@@ -1,8 +1,14 @@
+body {
+	background-color: #ccc;
+	font-family: sans-serif;
+}
+
 main {
 	display: grid;
 	grid-template-columns: repeat(var(--size), 1fr);
 	text-align: center;
-	font-size: calc(70dvmin / var(--size));
+	font-size: calc(80dvmin / var(--size));
+	line-height: 1.2;
 }
 
 b {
@@ -11,4 +17,17 @@ b {
 
 emoji-picker {
 	--emoji-font-family: inherit;
+}
+
+dialog {
+	padding: 0;
+}
+
+dialog::backdrop {
+	backdrop-filter: blur(10px);
+}
+
+footer {
+	margin-top: 3em;
+	font-size: 80%;
 }
