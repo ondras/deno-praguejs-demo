@@ -40,6 +40,15 @@ function onClientOpen(socket: WebSocket) {
 	}
 }
 
+async function reset(url: URL) {
+	for (let [skey, value] of data) {
+		let key = skey.split(",").map(Number)
+		await kv.delete(key)
+	}
+	data.clear()
+	return Response.redirect(new URL("/", url))
+}
+
 async function handler(request: Request) {
 	if (request.headers.get("upgrade") == "websocket") {
 		const { socket, response } = Deno.upgradeWebSocket(request)
@@ -51,6 +60,7 @@ async function handler(request: Request) {
 	} else {
 		const url = new URL(request.url)
 		let path = decodeURIComponent(url.pathname)
+		if (path == "/reset") { return reset(url) }
 		if (path == "/") { path = "/index.html" }
 		path = join("./static", posix.normalize(path))
 		return serveFile(request, path)
