@@ -1,4 +1,3 @@
-import { serve } from "https://deno.land/std@0.192.0/http/server.ts"
 import { serveFile } from "https://deno.land/std@0.192.0/http/file_server.ts"
 import { posix, join } from "https://deno.land/std@0.192.0/path/mod.ts"
 
@@ -40,13 +39,12 @@ function onClientOpen(socket: WebSocket) {
 	}
 }
 
-async function reset(url: URL) {
-	for (let [skey, value] of data) {
+async function reset() {
+	for (let skey of data.keys()) {
 		let key = skey.split(",").map(Number)
 		await kv.delete(key)
 	}
 	data.clear()
-	return Response.redirect(new URL("/", url))
 }
 
 async function handler(request: Request) {
@@ -60,7 +58,10 @@ async function handler(request: Request) {
 	} else {
 		const url = new URL(request.url)
 		let path = decodeURIComponent(url.pathname)
-		if (path == "/reset") { return reset(url) }
+		if (path == "/reset") {
+			await reset()
+			return Response.redirect(new URL("/", url))
+		}
 		if (path == "/") { path = "/index.html" }
 		path = join("./static", posix.normalize(path))
 		return serveFile(request, path)
@@ -72,4 +73,6 @@ for await (let item of initialData) {
 	data.set(item.key.join(","), item.value)
 }
 
-serve(handler)
+Deno.cron("reset", "0 */2 * * *", reset)
+
+Deno.serve(handler)
